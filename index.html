@@ -3751,6 +3751,77 @@ let companySettings = {
 };
 let nextInvoiceNum = 1;
 
+  // === PERSISTANCE LOCALE (localStorage) ===
+const SS_KEY = 'siliastock_state_v1';
+
+function saveState() {
+  const data = {
+    products,
+    movements,
+    suppliers,
+    orders,
+    warehouses,
+    users,
+    caisses,
+    userCategories,
+    salesHistory,
+    companySettings,
+    counters: {
+      nextProdId,
+      nextMvtId,
+      nextSuppId,
+      nextOrderId,
+      nextWHId,
+      nextUserId,
+      nextCaisseId,
+      nextSaleId,
+      nextInvoiceNum,
+    },
+  };
+  try {
+    localStorage.setItem(SS_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error('saveState error', e);
+  }
+}
+
+function loadState() {
+  const raw = localStorage.getItem(SS_KEY);
+  if (!raw) return;
+  try {
+    const d = JSON.parse(raw);
+    products       = d.products       ?? products;
+    movements      = d.movements      ?? movements;
+    suppliers      = d.suppliers      ?? suppliers;
+    orders         = d.orders         ?? orders;
+    warehouses     = d.warehouses     ?? warehouses;
+    users          = d.users          ?? users;
+    caisses        = d.caisses        ?? caisses;
+    userCategories = d.userCategories ?? userCategories;
+    salesHistory   = d.salesHistory   ?? salesHistory;
+    companySettings = d.companySettings ?? companySettings;
+
+    if (d.counters) {
+      nextProdId     = d.counters.nextProdId     ?? nextProdId;
+      nextMvtId      = d.counters.nextMvtId      ?? nextMvtId;
+      nextSuppId     = d.counters.nextSuppId     ?? nextSuppId;
+      nextOrderId    = d.counters.nextOrderId    ?? nextOrderId;
+      nextWHId       = d.counters.nextWHId       ?? nextWHId;
+      nextUserId     = d.counters.nextUserId     ?? nextUserId;
+      nextCaisseId   = d.counters.nextCaisseId   ?? nextCaisseId;
+      nextSaleId     = d.counters.nextSaleId     ?? nextSaleId;
+      nextInvoiceNum = d.counters.nextInvoiceNum ?? nextInvoiceNum;
+    }
+  } catch (e) {
+    console.error('loadState error', e);
+  }
+}
+
+// Charger au démarrage
+loadState();
+
+// Sauvegarde automatique toutes les 5 secondes
+setInterval(saveState, 5000);
 function saveSettings() {
   companySettings.name = document.getElementById('set-company').value || companySettings.name;
   companySettings.addr = document.getElementById('set-addr').value || companySettings.addr;
